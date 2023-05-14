@@ -6,13 +6,18 @@ pub struct VM {
     pub memory: [u8; MEM_SIZE],
 
     /// This is the location of the current instruction in the memory.
+    ///
+    /// Apparently some people like to call this the "program counter"
     pub current_instruction_idx: usize,
 }
 
 impl VM {
     /// Loads a program from a Vec<u8> into the memory of the VM.
     pub fn load_program(&mut self, program: Vec<u8>) {
-        self.memory[..program.len()].copy_from_slice(&program);
+        let start_addr = 0x200;
+        let end_addr = 0x200 + program.len();
+
+        self.memory[start_addr..end_addr].copy_from_slice(&program);
     }
 
     /// Executes the current instruction of the VM.
@@ -28,7 +33,7 @@ impl Default for VM {
     fn default() -> Self {
         return Self {
             memory: [0; MEM_SIZE],
-            current_instruction_idx: 0,
+            current_instruction_idx: 0x200,
         };
     }
 }
