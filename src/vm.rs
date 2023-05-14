@@ -26,7 +26,9 @@ impl VM {
     pub fn tick(&mut self) -> anyhow::Result<()> {
         let instruction = (self.memory[self.pc] as u16) << 8 | (self.memory[self.pc + 1] as u16);
 
-        // println!("Current Instruction: {:02X?}", instruction);
+        println!("Program Counter: {}", self.pc);
+
+        println!("Instruction: {:02X?}", instruction);
 
         self.execute_instruction(instruction)?;
 
@@ -42,12 +44,16 @@ impl VM {
 
     /// Executes an instruction
     pub fn execute_instruction(&mut self, instruction: u16) -> anyhow::Result<()> {
-        match instruction {
+        let opcode = instruction >> 12;
+
+        println!("Opcode: {:02X?}", opcode);
+
+        match opcode {
             0x00E0 => {
                 println!("a");
             },
             _ => {
-                return Err(anyhow!("couldn't execute instruction: invalid instruction"))
+                return Err(anyhow!("couldn't execute instruction: invalid opcode"))
             } 
         }
 
