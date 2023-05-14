@@ -1,3 +1,5 @@
+use anyhow::anyhow;
+
 const MEM_SIZE: usize = 4096;
 
 /// A VM capable of executing CHIP-8 instructions. 
@@ -8,7 +10,7 @@ pub struct VM {
     /// This is the location of the current instruction in the memory.
     ///
     /// Apparently some people like to call this the "program counter"
-    pub current_instruction_idx: usize,
+    pub pc: usize,
 }
 
 impl VM {
@@ -21,10 +23,35 @@ impl VM {
     }
 
     /// Executes the current instruction of the VM.
-    pub fn tick(&mut self) {
-        let instruction = self.memory[self.current_instruction_idx];
+    pub fn tick(&mut self) -> anyhow::Result<()> {
+        let instruction = (self.memory[self.pc] as u16) << 8 | (self.memory[self.pc + 1] as u16);
 
-        println!("Instruction: {:#04X?}", instruction);
+        // println!("Current Instruction: {:02X?}", instruction);
+
+        self.execute_instruction(instruction)?;
+
+        if self.pc >= MEM_SIZE - 2 {
+            return Err(anyhow!("can't tick: program finished"))
+        }
+
+        // increment pc
+        self.pc += 2;
+
+        Ok(())
+    }
+
+    /// Executes an instruction
+    pub fn execute_instruction(&mut self, instruction: u16) -> anyhow::Result<()> {
+        match instruction {
+            0x00E0 => {
+                println!("a");
+            },
+            _ => {
+                return Err(anyhow!("couldn't execute instruction: invalid instruction"))
+            } 
+        }
+
+        Ok(())
     }
 }
 
@@ -33,7 +60,7 @@ impl Default for VM {
     fn default() -> Self {
         return Self {
             memory: [0; MEM_SIZE],
-            current_instruction_idx: 0x200,
+            pc: 0x200,
         };
     }
 }

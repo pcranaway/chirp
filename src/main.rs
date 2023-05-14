@@ -19,6 +19,6 @@ fn main() -> anyhow::Result<()> {
     vm.load_program(program);
 
     loop {
-        vm.tick();
+        vm.tick()?;
     }
 }
